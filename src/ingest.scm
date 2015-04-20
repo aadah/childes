@@ -8,10 +8,17 @@ within the data/ directory.
   (open-input-file (string-append DATA-DIR
 				  filename)))
 
+#|
+Given a file port, closes it.
+|#
 (define (close file-port)
   (close-port file-port)
   'done)
 
+#|
+Gets all lines from a file given the file port.
+Returns a list where each element is a line.
+|#
 (define (get-lines file-port)
   (let loop ((lines '())
 	     (port file-port))
@@ -19,5 +26,4 @@ within the data/ directory.
       (if (eof-object? line)
 	  (reverse lines)
 	  (loop (cons line lines)
-		port
-		(read-line port))))))
+		port)))))
