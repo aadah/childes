@@ -8,6 +8,9 @@ within the data/ directory.
   (open-input-file (string-append DATA-DIR
 				  filename)))
 
+#|
+Given
+|#
 (define (close file-port)
   (close-port file-port)
   'done)
