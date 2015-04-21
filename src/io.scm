@@ -1,8 +1,11 @@
 ;;;; io.scm - Provides file I/O for data/ directory.
+;;;; depends on: nothing
 
 ;-------------------------------------------------------------------------------
 
 (define DATA-DIR "../data/")
+(define PLAIN-DATA-DIR (string-append DATA-DIR "plain/"))
+(define LING-DATA-DIR (string-append DATA-DIR "ling/"))
 
 ;-------------------------------------------------------------------------------
 
@@ -11,8 +14,7 @@ Returns a handle on a file. filename is the file name
 within the data/ directory.
 |#
 (define (open filename)
-  (open-input-file (string-append DATA-DIR
-				  filename)))
+  (open-input-file filename))
 
 #|
 Given a file port, closes it.
@@ -23,18 +25,39 @@ Given a file port, closes it.
 
 #|
 Gets all lines from a file given the file port.
-Returns a list where each element is a line.
+Returns a list where each element is a line string.
 |#
 (define (get-lines file-port)
   (let loop ((lines '())
 	     (port file-port))
     (let ((line (read-line port)))
       (if (eof-object? line)
-	  (reverse lines)
+	  (begin (close file-port)
+		 (reverse lines))
 	  (loop (cons line lines)
 		port)))))
 
+#|
+Gets all words from a file given the file port.
+Returns a list where each element is a word string.
+|#
+(define (get-words file-port)
+  (let loop ((words '())
+	     (port file-port))
+    (let ((word (read-string char-set:whitespace port)))
+      (if (eof-object? word)
+	  (begin (close file-port)
+		 (reverse words))
+	  (loop (if (string=? word "")
+		    (begin (read-string char-set:not-whitespace file-port)
+			   words)
+		    (cons word
+			  words))
+		port)))))
+
 ;-------------------------------------------------------------------------------
+
+;;; ignore below for now
 
 #|
 Returns a port with the given string as the source.
@@ -57,7 +80,8 @@ Returns a list of all the words in the given string.
 	     (port string-port))
     (let ((word (read port)))
       (if (eof-object? word)
-	  (reverse words)
+	  (begin (close file-port)
+		 (reverse words))
 	  (loop (cons (symbol->string word)
 		      words)
 		port)))))

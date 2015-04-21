@@ -1,4 +1,4 @@
-;;;; ingest.scm - Provides file I/O for data/ directory.
+;;;; io.scm - Provides file I/O for data/ directory.
 
 ;-------------------------------------------------------------------------------
 
