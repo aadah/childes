@@ -7,6 +7,7 @@
 (load "set-utils")
 (load "alist-utils")
 (load "search-utils")
+(load "ghelper")
 
 ;-------------------------------------------------------------------------------
 
@@ -81,3 +82,10 @@
 				(descore res2))
    metric:freq))
 
+;-------------------------------------------------------------------------------
+
+(define search (make-generic-operator 1 'search))
+
+(defhandler search s:keyword word?)
+(defhandler search s:keywords words?)
+(defhandler search s:phrase phrase?)
