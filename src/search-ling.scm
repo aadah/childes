@@ -39,25 +39,24 @@
 (define (l:keyword word tier)
   (let* ((l-ii (ii/get *ii* (key-for-tier tier)))
 		 (raw (ii/get l-ii word)))
-	(pp raw)
 	(if raw
 		(s:score raw metric:freq)
 		#f)))
 
-#|
+
 ;; keyword search for multiple words
 (define (l:keywords words tier)
-  (let ((l-ii ii/get *ii* (key-for-tier tier)))
+  (let ((l-ii (ii/get *ii* (key-for-tier tier))))
 	(if (= (length words) 1)
 		(l:keyword (car words))
 		(let ((raw (map (lambda (x)
-						  (ii/get l-ii words))
+						  (ii/get l-ii x))
 						words)))
 		  (if raw
 			  (let ((res (alist-union-multi raw)))
 				(s:score res metric:freq))
 			  #f)))))
-
+#|
 (define (s:keywords-with-offset w1 w2 k)
   (let ((a (ii/get *ii* w1))
 		(b (ii/get *ii* w2)))
