@@ -1,5 +1,4 @@
 ;;;; search-basic.scm - Search utilities
-;;;; depends on: init.scm
 
 ;-------------------------------------------------------------------------------
 
@@ -23,7 +22,7 @@
 ;; keyword search for multiple words
 (define (s:keywords words)
   (if (= (length words) 1)
-	  (s:keyword (car w))
+	  (s:keyword (car words))
 	  (let ((raw (map (lambda (x)
 						(ii/get *ii* x))
 					  words)))
