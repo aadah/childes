@@ -33,7 +33,7 @@
 		(let lp ((str (string-tail s (+ ref 1)))
 				 (lst (list (string-head s ref))))
 		  (let ((ref (string-find-next-char str #\space)))
-			(pp str)
+			;(pp str)
 			(if (not ref)
 				(append lst (list str))
 				(lp (string-tail str (+ ref 1))

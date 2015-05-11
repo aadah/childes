@@ -66,8 +66,8 @@
 
 ;; filter a for elements that have an element in b with offset k
 (define (set-filter-by-offset a b k)
-  (pp a)
-  (pp b)
+  ;(pp a)
+  ;(pp b)
   (if (and (list? a) (list? b))
 	  (let ((res (list-transform-positive a
 				   (lambda (x)

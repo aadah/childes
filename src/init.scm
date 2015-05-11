@@ -13,7 +13,7 @@
 ; Alice in Wonderland, by Lewis Carroll
 (ii/add-doc! *ii* (create-plain-doc "alice.txt"))
 ; Bible (King James Version)
-;(ii/add-doc! *ii* (create-plain-doc "bible.txt"))
+(ii/add-doc! *ii* (create-plain-doc "bible.txt"))
 ; Paradise Lost, by John Milton
 ;(ii/add-doc! *ii* (create-plain-doc "paradise.txt"))
 ; The Republic, by Plato
