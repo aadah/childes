@@ -46,18 +46,16 @@ Returns a list where each element is a word string.
 	     (port file-port))
     (let ((word (read-string char-set:whitespace port)))
       (if (eof-object? word)
-	  (begin (close file-port)
+	  (begin (close port)
 		 (reverse words))
 	  (loop (if (string=? word "")
-		    (begin (read-string char-set:not-whitespace file-port)
+		    (begin (read-string char-set:not-whitespace port)
 			   words)
 		    (cons word
 			  words))
 		port)))))
 
 ;-------------------------------------------------------------------------------
-
-;;; ignore below for now
 
 #|
 Returns a port with the given string as the source.
@@ -75,13 +73,49 @@ Close a given string port.
 #|
 Returns a list of all the words in the given string.
 |#
-(define (split-string string-port)
+(define (split-string string)
   (let loop ((words '())
-	     (port string-port))
-    (let ((word (read port)))
+	     (port (open-string string)))
+    (let ((word (read-string char-set:whitespace port)))
       (if (eof-object? word)
-	  (begin (close file-port)
+	  (begin (close port)
 		 (reverse words))
-	  (loop (cons (symbol->string word)
-		      words)
+	  (loop (if (string=? word "")
+		    (begin (read-string char-set:not-whitespace port)
+			   words)
+		    (cons word
+			  words))
+;(cons (symbol->string word)
+;	   words)
 		port)))))
+
+;-------------------------------------------------------------------------------
+
+#|
+Returns a list of the filenames in the specified directory, given as a string.
+Recurses down directories.
+|#
+(define (get-filenames directory)
+  (let ((pathnames (directory-read directory)))
+    (apply append (map (lambda (pathname)
+			 (if (pathname-type pathname)
+			     (if (string=? (pathname-type pathname)
+					   "cha")
+				 (list (string-append (pathname-name pathname)
+						      "."
+						      (pathname-type pathname)))
+				 '())
+			     (if (or (string=? (pathname-name pathname)
+					       ".")
+				     (string=? (pathname-name pathname)
+					       ".."))
+				 '()
+				 (map (lambda (filename)
+					(string-append (pathname-name pathname)
+						       "/"
+						       filename))
+				      (get-filenames (string-append directory
+								    "/"
+								    (pathname-name pathname)
+								    "/"))))))
+		       pathnames))))

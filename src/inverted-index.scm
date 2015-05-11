@@ -5,6 +5,7 @@
 
 (load "utils")
 (load "document")
+(load "ghelper")
 
 ;-------------------------------------------------------------------------------
 
@@ -23,6 +24,14 @@
 (define (ii/get ii key)
   (let ((hash-table (cadr ii)))
     (hash-table/get hash-table key #f)))
+
+(define (ii/keys ii)
+  (let ((hash-table (cadr ii)))
+    (hash-table/key-list hash-table)))
+
+(define (ii/values ii)
+  (let ((hash-table (cadr ii)))
+    (hash-table/datum-list hash-table)))
 
 ;-------------------------------------------------------------------------------
 
@@ -99,7 +108,147 @@
 
 ;-------------------------------------------------------------------------------
 
-(define (ii/add-doc! ii doc)
-  (cond ((plain-doc? doc) (ii/add-plain-doc! ii doc))
-	;((ling-doc? doc) (ii/add-ling-doc! ii doc)) ; TODO
-	(else (error "Don't know how to add doc" doc))))
+(define *tiers* '("%act:"
+		  "%add:"
+		  "%alt:"
+		  "%cnl:"
+		  "%cod:"
+		  "%coh:"
+		  "%com:"
+		  "%def:"
+		  "%eng:"
+		  "%err:"
+		  "%exp:"
+		  "%fac:"
+		  "%flo:"
+		  "%gls:"
+		  "%gpx:"
+		  "%gra:"
+		  "%grt:"
+		  "%int:"
+		  "%mod:"
+		  "%mor:"
+		  "%ort:"
+		  "%par:"
+		  "%pho:"
+		  "%sin:"
+		  "%sit:"
+		  "%spa:"
+		  "%tim:"
+		  "%trn:"
+		  "%xpho:"
+		  "*"))
+
+(define *headers* '("@Font:"
+		    "@UTF8"
+		    "@PID:"
+		    "@ColorWords"
+		    "@Begin"
+		    "@Languages:"
+		    "@Participants:"
+		    "@Options:"
+		    "@ID:"
+		    "@Media:"
+		    "@End"
+		    "@Exceptions:"
+		    "@Interaction Type:"
+		    "@Location:"
+		    "@Number:"
+		    "@Recording Quality:"
+		    "@Room Layout:"
+		    "@Tape Location:"
+		    "@Time Duration:"
+		    "@Time Start:"
+		    "@Transcriber:"
+		    "@Transcription:"
+		    "@Warning:"
+		    "@Activities:"
+		    "@Bck:"
+		    "@Bg:"
+		    "@Blank"
+		    "@Comment:"
+		    "@Date:"
+		    "@Eg:"
+		    "@G:"
+		    "@New Episode"
+		    "@New Language:"
+		    "@Page:"
+		    "@Situation:"))
+
+(define *tier-keys* (map (lambda (tier)
+			   (list tier (random-string 25)))
+			 *tiers*))
+
+(define *header-keys* (map (lambda (header)
+			     (list header (random-string 25)))
+			   *headers*))
+
+(define (key-for-tier tier)
+  (cadr (assoc tier *tier-keys*)))
+
+(define (key-for-header header)
+  (cadr (assoc header *header-keys*)))
+
+(define (ii/add-ling-doc! ii doc)
+  (let* ((docname (ling-doc/name doc))
+	 (metadata (ling-doc/metadata doc))
+	 (groups (ling-doc/convo doc))
+	 (metadata-words (apply append metadata))
+	 (group-words (apply append (map (lambda (group)
+					   (apply append group))
+					 groups)))
+	 (words (append metadata-words group-words)))
+    (for-each (lambda (index word)
+		(ii/update! ii word docname index))
+	      (iota (length words))
+	      words)
+    (for-each (lambda (key-pair)
+		(ii/put! ii
+			 (cadr key-pair)
+			 (make-inverted-index)))
+	      *tier-keys*)
+    (for-each (lambda (key-pair)
+		(ii/put! ii
+			 (cadr key-pair)
+			 (make-inverted-index)))
+	      *header-keys*)
+    (let loop ((group-words group-words)
+	       (index (+ (length metadata-words)
+			 1))
+	       (tag (car group-words)))
+      (cond ((null? group-words) 'done)
+	    ((starts-with? (car group-words)
+			   participant-marker)
+	     (begin (ii/update! (ii/get ii
+					(key-for-tier "*"))
+				(car group-words)
+				docname
+				index)
+		    (loop (cdr group-words)
+			  (+ index 1)
+			  "*")))
+	    ((starts-with? (car group-words)
+			   tier-marker)
+	     (begin (ii/update! (ii/get ii
+					(key-for-tier (car group-words)))
+				(car group-words)
+				docname
+				index)
+		    (loop (cdr group-words)
+			  (+ index 1)
+			  (car group-words))))
+	    (else (begin (ii/update! (ii/get ii
+					     (key-for-tier tag))
+				     (car group-words)
+				     docname
+				     index)
+			 (loop (cdr group-words)
+			       (+ index 1)
+			       tag)))))))
+
+;-------------------------------------------------------------------------------
+
+(define ii/add-doc! (make-generic-operator 2 'ii/add-doc!))
+
+(defhandler ii/add-doc! ii/add-plain-doc! inverted-index? plain-doc?)
+(defhandler ii/add-doc! ii/add-ling-doc! inverted-index? ling-doc?)
