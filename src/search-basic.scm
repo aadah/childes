@@ -3,7 +3,6 @@
 
 ;-------------------------------------------------------------------------------
 
-(load "init")
 (load "set-utils")
 (load "alist-utils")
 (load "search-utils")
