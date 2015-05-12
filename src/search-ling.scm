@@ -56,16 +56,17 @@
 			  (let ((res (alist-union-multi raw)))
 				(s:score res metric:freq))
 			  #f)))))
-#|
-(define (s:keywords-with-offset w1 w2 k)
-  (let ((a (ii/get *ii* w1))
-		(b (ii/get *ii* w2)))
+
+(define (l:keywords-with-offset w1 w2 k tier)
+  (let* ((l-ii (ii/get *ii* (key-for-tier tier)))
+		 (a (ii/get l-ii w1))
+		 (b (ii/get l-ii w2)))
 	(if (and (alist? a) (alist? b))
 		(alist-filter-by-offset a b k)
 		#f)))
 
 ;; assumes a space-delimited phrase
-(define (s:phrase phrase)
+(define (l:phrase phrase tier)
   (let ((words (split-string-by-space phrase)))	
 	(let lp ((docs (map (lambda (x)
 						  (ii/get *ii* x))
@@ -83,4 +84,11 @@
 				  k)
 				 (+ k 1)))))))
 
-|#
+
+;-------------------------------------------------------------------------------
+
+(define search (make-generic-operator 2 'search:ling))
+
+(defhandler search:ling l:keyword word? tier?)
+(defhandler search:ling l:keywords words? tier?)
+(defhandler search:ling l:phrase phrase? tier?)

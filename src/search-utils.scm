@@ -24,6 +24,9 @@
   (and (string? str)
 	   (not (not (string-find-next-char str #\space)))))
 
+(define (tier? str)
+  (not (not (member str *tiers*))))
+
 (define (metric:freq doc)
   (length (indices doc)))
 
@@ -53,3 +56,4 @@
 		 (append (list (car doc))
 				 (caddr doc)))
 	   res))
+
