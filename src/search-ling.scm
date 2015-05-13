@@ -67,11 +67,13 @@
 
 ;; assumes a space-delimited phrase
 (define (l:phrase phrase tier)
-  (let ((words (split-string-by-space phrase)))	
+  (let ((words (split-string-by-space phrase))
+		(l-ii (ii/get *ii* tier)))
+	(pp l-ii)
 	(let lp ((docs (map (lambda (x)
-						  (ii/get *ii* x))
+						  (ii/get l-ii x))
 						(cdr words)))
-			 (res (ii/get *ii* (car words)))
+			 (res (ii/get l-ii (car words)))
 			 (k 1))
 	  (cond ((null? docs) res)
 			((not res) #f)
@@ -87,7 +89,7 @@
 
 ;-------------------------------------------------------------------------------
 
-(define search (make-generic-operator 2 'search:ling))
+(define search:ling (make-generic-operator 2 'search:ling))
 
 (defhandler search:ling l:keyword word? tier?)
 (defhandler search:ling l:keywords words? tier?)
