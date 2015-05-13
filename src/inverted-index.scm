@@ -203,14 +203,18 @@
 	      (iota (length words))
 	      words)
     (for-each (lambda (key-pair)
-		(ii/put! ii
-			 (cadr key-pair)
-			 (make-inverted-index)))
+		(if (ii/get ii (cadr key-pair))
+		    'done
+		    (ii/put! ii
+			     (cadr key-pair)
+			     (make-inverted-index))))
 	      *tier-keys*)
     (for-each (lambda (key-pair)
-		(ii/put! ii
-			 (cadr key-pair)
-			 (make-inverted-index)))
+		(if (ii/get ii (cadr key-pair))
+		    'done
+		    (ii/put! ii
+			     (cadr key-pair)
+			     (make-inverted-index))))
 	      *header-keys*)
     (let loop ((group-words group-words)
 	       (index (+ (length metadata-words)
