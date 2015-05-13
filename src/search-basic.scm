@@ -56,28 +56,33 @@
 				  k)
 				 (+ k 1)))))))
 
-;; rank alist with (id score)
+;; rank alist with (id score) and removes indices from results
 ; assumes string id, integer score
 (define (s:rank lst)
-  (sort lst
-		(lambda (x y)
-		  (cond ((> (cadr x) (cadr y))
-				 #t)
-				((= (cadr x) (cadr y))
-				 (string<? (car x) (car y)))
-				(else #f)))))
+  (let ((sorted (sort lst
+					  (lambda (x y)
+						(cond ((> (cadr x) (cadr y))
+							   #t)
+							  ((= (cadr x) (cadr y))
+							   (string<? (car x) (car y)))
+							  (else #f))))))
+	(deindex sorted)))
 		
-(define (s:and res1 res2)
-  (s:score
-   (alist-intersect (descore res1)
-					(descore res2))
-   metric:freq))
+(define (s:and . results)
+  (let ((descored-results (map descore results)))
+	(s:score
+	 (reduce alist-intersect
+			 '()
+			 descored-results)
+	  metric:freq)))
 
-(define (s:or res1 res2)
-  (s:score 
-   (alist-union (descore res1) 
-				(descore res2))
-   metric:freq))
+(define (s:or . results)
+  (let ((descored-results (map descore results)))
+	(s:score 
+	 (reduce alist-union
+			 '()
+			 descored-results)
+	 metric:freq)))
 
 ;-------------------------------------------------------------------------------
 
