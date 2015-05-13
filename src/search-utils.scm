@@ -47,10 +47,9 @@
   (map (lambda (doc)
 		 (list (name doc)
 			   (metric doc)
-			   ;(indices doc)
+			   (indices doc)
 			   ))
 	   res))
-
 
 (define (descore res)
   (map (lambda (doc)
@@ -58,3 +57,8 @@
 				 (caddr doc)))
 	   res))
 
+(define (deindex res)
+  (map (lambda (doc)
+		 (append (list (car doc))
+				 (cadr doc)))
+	   res))
