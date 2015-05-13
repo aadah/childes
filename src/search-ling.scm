@@ -68,8 +68,7 @@
 ;; assumes a space-delimited phrase
 (define (l:phrase phrase tier)
   (let ((words (split-string-by-space phrase))
-		(l-ii (ii/get *ii* tier)))
-	(pp l-ii)
+		(l-ii (ii/get *ii* (key-for-tier tier))))
 	(let lp ((docs (map (lambda (x)
 						  (ii/get l-ii x))
 						(cdr words)))
