@@ -47,7 +47,8 @@
   (map (lambda (doc)
 		 (list (name doc)
 			   (metric doc)
-			   (indices doc)))
+			   ;(indices doc)
+			   ))
 	   res))
 
 
