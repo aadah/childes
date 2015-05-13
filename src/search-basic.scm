@@ -49,7 +49,6 @@
 	  (cond ((null? docs) res)
 			((not res) #f)
 			(else
-			 (pp res)
 			 (lp (cdr docs)
 				 (alist-filter-by-offset
 				  res
