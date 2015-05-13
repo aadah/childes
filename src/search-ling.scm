@@ -74,10 +74,10 @@
 						(cdr words)))
 			 (res (ii/get l-ii (car words)))
 			 (k 1))
-	  (cond ((null? docs) res)
+	  (cond ((null? docs) 
+			 (s:score res metric:freq))
 			((not res) #f)
 			(else
-			 (pp res)
 			 (lp (cdr docs)
 				 (alist-filter-by-offset
 				  res
