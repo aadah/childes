@@ -46,7 +46,8 @@
 						(cdr words)))
 			 (res (ii/get *ii* (car words)))
 			 (k 1))
-	  (cond ((null? docs) res)
+	  (cond ((null? docs) 
+			 (s:score res metric:freq))
 			((not res) #f)
 			(else
 			 (lp (cdr docs)
@@ -59,14 +60,17 @@
 ;; rank alist with (id score) and removes indices from results
 ; assumes string id, integer score
 (define (s:rank lst)
-  (let ((sorted (sort lst
-					  (lambda (x y)
-						(cond ((> (cadr x) (cadr y))
-							   #t)
-							  ((= (cadr x) (cadr y))
-							   (string<? (car x) (car y)))
-							  (else #f))))))
-	(deindex sorted)))
+  (if (list? lst)
+	  (let ((sorted 
+			 (sort lst
+				   (lambda (x y)
+					 (cond ((> (cadr x) (cadr y))
+							#t)
+						   ((= (cadr x) (cadr y))
+							(string<? (car x) (car y)))
+						   (else #f))))))
+		(deindex sorted))
+	  #f))
 		
 (define (s:and . results)
   (let ((descored-results (map descore results)))
